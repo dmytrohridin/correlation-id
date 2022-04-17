@@ -17,7 +17,7 @@ type CorrelationIdMiddleware struct {
 	HeaderName        string
 	IncludeInResponse bool
 	EnforceHeader     bool
-	IdGenerator       func(ctx context.Context) string
+	IdGenerator       func() string
 }
 
 func New() CorrelationIdMiddleware {
@@ -39,7 +39,7 @@ func (m *CorrelationIdMiddleware) Handle(next http.Handler) http.Handler {
 				return
 			}
 
-			corrId = m.generateId(r.Context())
+			corrId = m.generateId()
 		}
 
 		if m.IncludeInResponse {
@@ -56,7 +56,7 @@ func FromContext(ctx context.Context) string {
 	return corrId
 }
 
-func defultGenerator(ctx context.Context) string {
+func defultGenerator() string {
 	return uuid.NewString()
 }
 
@@ -68,10 +68,10 @@ func (m *CorrelationIdMiddleware) getHeaderName() string {
 	return m.HeaderName
 }
 
-func (m *CorrelationIdMiddleware) generateId(ctx context.Context) string {
+func (m *CorrelationIdMiddleware) generateId() string {
 	if m.IdGenerator != nil {
-		return m.IdGenerator(ctx)
+		return m.IdGenerator()
 	}
 
-	return defultGenerator(ctx)
+	return defultGenerator()
 }

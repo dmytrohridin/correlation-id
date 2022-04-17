@@ -52,8 +52,11 @@ func (m *Middleware) Handle(next http.Handler) http.Handler {
 }
 
 func FromContext(ctx context.Context) string {
-	corrId := ctx.Value(ContextKey).(string)
-	return corrId
+	corrId, ok := ctx.Value(ContextKey).(string)
+	if ok {
+		return corrId
+	}
+	return ""
 }
 
 func defaultGenerator() string {

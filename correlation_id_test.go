@@ -1,6 +1,7 @@
 package correlationid
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -251,6 +252,22 @@ func TestFlowWhenHeaderProvided(t *testing.T) {
 
 	if header != testId {
 		t.Errorf("Unexpected %s value. Expected: %s. Actual %s", DefaultHeaderName, testId, header)
+	}
+}
+
+func TestFromContextReturnValue(t *testing.T) {
+	testVal := "test_value"
+	ctx := context.WithValue(context.Background(), ContextKey, testVal)
+	res := FromContext(ctx)
+	if res != testVal {
+		t.Errorf("Unexpected result. Expected: %s. Actual: %s", testVal, res)
+	}
+}
+
+func TestFromContextReturnEmpty(t *testing.T) {
+	res := FromContext(context.Background())
+	if res != "" {
+		t.Errorf("Unexpected result. Should be empty. Actual: %s", res)
 	}
 }
 

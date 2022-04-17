@@ -25,7 +25,7 @@ func New() Middleware {
 		HeaderName:        DefaultHeaderName,
 		IncludeInResponse: true,
 		EnforceHeader:     false,
-		IdGenerator:       defultGenerator,
+		IdGenerator:       defaultGenerator,
 	}
 }
 
@@ -56,7 +56,7 @@ func FromContext(ctx context.Context) string {
 	return corrId
 }
 
-func defultGenerator() string {
+func defaultGenerator() string {
 	return uuid.NewString()
 }
 
@@ -73,5 +73,5 @@ func (m *Middleware) generateId() string {
 		return m.IdGenerator()
 	}
 
-	return defultGenerator()
+	return defaultGenerator()
 }

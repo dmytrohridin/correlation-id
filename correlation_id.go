@@ -13,15 +13,15 @@ const (
 	ContextKey        = "CorrelationId"
 )
 
-type CorrelationIdMiddleware struct {
+type Middleware struct {
 	HeaderName        string
 	IncludeInResponse bool
 	EnforceHeader     bool
 	IdGenerator       func() string
 }
 
-func New() CorrelationIdMiddleware {
-	return CorrelationIdMiddleware{
+func New() Middleware {
+	return Middleware{
 		HeaderName:        DefaultHeaderName,
 		IncludeInResponse: true,
 		EnforceHeader:     false,
@@ -29,7 +29,7 @@ func New() CorrelationIdMiddleware {
 	}
 }
 
-func (m *CorrelationIdMiddleware) Handle(next http.Handler) http.Handler {
+func (m *Middleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		headerName := m.getHeaderName()
 		corrId := r.Header.Get(headerName)
@@ -60,7 +60,7 @@ func defultGenerator() string {
 	return uuid.NewString()
 }
 
-func (m *CorrelationIdMiddleware) getHeaderName() string {
+func (m *Middleware) getHeaderName() string {
 	if m.HeaderName == "" {
 		return DefaultHeaderName
 	}
@@ -68,7 +68,7 @@ func (m *CorrelationIdMiddleware) getHeaderName() string {
 	return m.HeaderName
 }
 
-func (m *CorrelationIdMiddleware) generateId() string {
+func (m *Middleware) generateId() string {
 	if m.IdGenerator != nil {
 		return m.IdGenerator()
 	}

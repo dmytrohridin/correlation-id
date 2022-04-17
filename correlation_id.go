@@ -8,26 +8,24 @@ import (
 	"github.com/google/uuid"
 )
 
-type CorrelationIdType string
-
 const (
-	DefaultCorrelationIdHeaderName                   = "Correlation-Id"
-	CorrelationId                  CorrelationIdType = "CorrelationId"
+	DefaultHeaderName = "Correlation-Id"
+	ContextKey        = "CorrelationId"
 )
 
 type CorrelationIdMiddleware struct {
 	HeaderName        string
 	IncludeInResponse bool
 	EnforceHeader     bool
-	IdGenerator       func() string
+	IdGenerator       func(ctx context.Context) string
 }
 
 func New() CorrelationIdMiddleware {
 	return CorrelationIdMiddleware{
-		HeaderName:        DefaultCorrelationIdHeaderName,
+		HeaderName:        DefaultHeaderName,
 		IncludeInResponse: true,
 		EnforceHeader:     false,
-		IdGenerator:       uuid.NewString,
+		IdGenerator:       defultGenerator,
 	}
 }
 
@@ -41,35 +39,39 @@ func (m *CorrelationIdMiddleware) Handle(next http.Handler) http.Handler {
 				return
 			}
 
-			corrId = m.generateId()
+			corrId = m.generateId(r.Context())
 		}
 
 		if m.IncludeInResponse {
 			rw.Header().Set(headerName, corrId)
 		}
 
-		updCtx := context.WithValue(r.Context(), CorrelationId, corrId)
+		updCtx := context.WithValue(r.Context(), ContextKey, corrId)
 		next.ServeHTTP(rw, r.WithContext(updCtx))
 	})
 }
 
 func FromContext(ctx context.Context) string {
-	corrId := ctx.Value(CorrelationId).(string)
+	corrId := ctx.Value(ContextKey).(string)
 	return corrId
+}
+
+func defultGenerator(ctx context.Context) string {
+	return uuid.NewString()
 }
 
 func (m *CorrelationIdMiddleware) getHeaderName() string {
 	if m.HeaderName == "" {
-		return DefaultCorrelationIdHeaderName
+		return DefaultHeaderName
 	}
 
 	return m.HeaderName
 }
 
-func (m *CorrelationIdMiddleware) generateId() string {
+func (m *CorrelationIdMiddleware) generateId(ctx context.Context) string {
 	if m.IdGenerator != nil {
-		return m.IdGenerator()
+		return m.IdGenerator(ctx)
 	}
 
-	return uuid.NewString()
+	return defultGenerator(ctx)
 }

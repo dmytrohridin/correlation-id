@@ -271,6 +271,16 @@ func TestFromContextReturnEmpty(t *testing.T) {
 	}
 }
 
+func TestWithCorrelationIdReturnUpdateCtx(t *testing.T) {
+	expected := "test_corr_id"
+	updatedCtx := WithCorrelationId(context.Background(), expected)
+
+	actual := FromContext(updatedCtx)
+	if actual != expected {
+		t.Errorf("Unexpected value. Expected: %s. Actual: %s", expected, actual)
+	}
+}
+
 func getTestHandler() http.HandlerFunc {
 	fn := func(rw http.ResponseWriter, req *http.Request) {
 		_, _ = rw.Write([]byte("test"))

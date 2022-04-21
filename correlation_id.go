@@ -46,7 +46,7 @@ func (m *Middleware) Handle(next http.Handler) http.Handler {
 			rw.Header().Set(headerName, corrId)
 		}
 
-		updCtx := context.WithValue(r.Context(), ContextKey, corrId)
+		updCtx := WithCorrelationId(r.Context(), corrId)
 		next.ServeHTTP(rw, r.WithContext(updCtx))
 	})
 }
@@ -57,6 +57,10 @@ func FromContext(ctx context.Context) string {
 		return corrId
 	}
 	return ""
+}
+
+func WithCorrelationId(ctx context.Context, correlationId string) context.Context {
+	return context.WithValue(ctx, ContextKey, correlationId)
 }
 
 func defaultGenerator() string {

@@ -1,3 +1,4 @@
+// Package correlationid provides handler for getting correlationid header from request or generate new and set it to request context.
 package correlationid
 
 import (
@@ -9,17 +10,26 @@ import (
 )
 
 const (
+	// Header name. Can be overridden in Middlware struct.
 	DefaultHeaderName = "Correlation-Id"
-	ContextKey        = "CorrelationId"
+	// Key used for correlation id value in context.
+	ContextKey = "CorrelationId"
 )
 
+// Middlware struct with handler settings.
 type Middleware struct {
-	HeaderName        string
+	// Used for correlation id. Default "Correlation-Id".
+	HeaderName string
+	// Used for indicating should correlation id be included in response headers. Default "true".
 	IncludeInResponse bool
-	EnforceHeader     bool
-	IdGenerator       func() string
+	// Used for enforcing client include correlation id header in request. If "true" and header is absent - middlware will return BadRequest status code.
+	// Default "false".
+	EnforceHeader bool
+	// Used for correlation id generation if id is not included in request. By default uses github.com/google/uuid.
+	IdGenerator func() string
 }
 
+// Initialize default value of middleware. By default uses github.com/google/uuid for correlation id value.
 func New() Middleware {
 	return Middleware{
 		HeaderName:        DefaultHeaderName,
@@ -29,6 +39,7 @@ func New() Middleware {
 	}
 }
 
+// Handles http request and proceed correlation id based on Middlware settings.
 func (m *Middleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		headerName := m.getHeaderName()
@@ -51,6 +62,7 @@ func (m *Middleware) Handle(next http.Handler) http.Handler {
 	})
 }
 
+// Returns correlation id from context if present. Oservice "".
 func FromContext(ctx context.Context) string {
 	corrId, ok := ctx.Value(ContextKey).(string)
 	if ok {
@@ -59,6 +71,7 @@ func FromContext(ctx context.Context) string {
 	return ""
 }
 
+// Sets correlation id to context
 func WithCorrelationId(ctx context.Context, correlationId string) context.Context {
 	return context.WithValue(ctx, ContextKey, correlationId)
 }

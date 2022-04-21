@@ -62,7 +62,7 @@ func (m *Middleware) Handle(next http.Handler) http.Handler {
 	})
 }
 
-// Returns correlation id from context if present. Oservice "".
+// Returns correlation id from context if present. Otherwise "".
 func FromContext(ctx context.Context) string {
 	corrId, ok := ctx.Value(ContextKey).(string)
 	if ok {

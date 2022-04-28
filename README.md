@@ -1,4 +1,4 @@
-# Correlation Id
+# Correlation Id [![Build Status](https://github.com/dmytrohridin/correlation-id/workflows/build/badge.svg)](https://github.com/dmytrohridin/correlation-id/actions) [![godoc](https://godoc.org/github.com/dmytrohridin/correlation-id?status.svg)](https://godoc.org/github.com/dmytrohridin/correlation-id)
 Correlations Id is used in distributed applications to trace requests across multiple services. This package provides a lightweight correlation id middlware. Request headers are checked for a correlation id. If found or generated, this correlation id is attached to the request context which can be used to access the current correlation id where it is required for logging etc. Based on middleware settings correlation id can be returned with response headers.
 
 ## Install and update
